@@ -37,9 +37,9 @@ def base64_to_number(b64_str):
     """Convert base64 to integer"""
     try:
         # Decode base64 to bytes, then convert bytes to integer
-        decoded_bytes = base64.b64decode(b64_str)
-        return int.from_bytes(decoded_bytes, byteorder='big')
-    except:
+        decoded_bytes = base64.b64decode(b64_str, validate=True)
+        return int.from_bytes(decoded_bytes, byteorder='little')
+    except Exception:
         raise ValueError("Invalid base64 input")
 
 def number_to_base64(number):
@@ -47,9 +47,11 @@ def number_to_base64(number):
     try:
         # Convert integer to bytes, then encode to base64
         byte_count = (number.bit_length() + 7) // 8
-        number_bytes = number.to_bytes(byte_count, byteorder='big')
+        if byte_count == 0:  # Handle zero case
+            byte_count = 1
+        number_bytes = number.to_bytes(byte_count, byteorder='little')
         return base64.b64encode(number_bytes).decode('utf-8')
-    except:
+    except Exception:
         raise ValueError("Unable to convert to base64")
 
 @app.route('/')
